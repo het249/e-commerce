@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>
+            Login Page
+        </title>
+    </head>
+    <body>
+        <form id="loginForm" action="/login" method="post">
+            <div>
+                <label>Email</label>
+                <input type="email" name="email"/>
+            </div>
+            <div>
+                <label>Password</label>
+                <input type="password" name="password"/>
+            </div>
+            <input type="submit" id="loginBtn" value="Login"/>
+        </form>
+        <script>
+            const createMessageElement = (message)=>{
+                const messageDiv = document.createElement('span')
+                const messageText = document.createTextNode(message)
+                messageDiv.appendChild(messageText)
+                const formElement = document.getElementById('loginForm')
+                formElement.insertBefore(messageDiv,formElement.lastElementChild)
+            }
+
+            const loginUser = async (event) => {
+                console.log('function called');
+                event.preventDefault();
+                const formData = {};
+                const formElement = document.getElementById('loginForm');
+                for (const pair of new FormData(formElement)) {
+                    formData[pair[0]]= pair[1];
+                }
+                console.log(JSON.stringify(formData));
+                const req = await fetch('/login',{
+                    method:'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                const data = await req.json();
+                if(!data.err){
+                    console.log("logged in.");
+                    if(data.user){
+                        sessionStorage.setItem('userToken',data.userToken);
+                    }
+                }
+                else{
+                    console.log('error');
+                    createMessageElement(err.data.message);
+                }
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.addEventListener('click',loginUser);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>
+            Registration Page
+        </title>
+        <script>
+            function createMessageElement(message){
+                const messageDiv = document.createElement('span');
+                const messageText = document.createTextNode(message);
+                messageDiv.appendChild(messageText);
+                const formElement = document.getElementById('registerForm');
+                formElement.insertBefore(messageDiv,formElement.lastElementChild)
+            }
+
+            async function registerUser(event){
+                console.log('function called');
+                event.preventDefault();
+                const formData = {};
+                const formElement = document.getElementById('registerForm');
+                for (const pair of new FormData(formElement)) {
+                    formData[pair[0]]= pair[1];
+                }
+                console.log(JSON.stringify(formData));
+                const res =  await fetch('/register',{
+                    method:'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                const data = await res.json();
+                if(!data.err){
+                    console.log('successfully logged in.');
+                    window.location.href='/login';
+                }
+                else{
+                    console.log('error in registeration.');
+                    createMessageElement(err.data.message);
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <form id='registerForm'>
+            <div>
+                <label>First Name</label>
+                <input type="text" name="firstName"/>
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input type="text" name="lastName"/>
+            </div>
+            <div>
+                <label>Email</label>
+                <input type="email" name="email"/>
+            </div>
+            <div>
+                <label>Password</label>
+                <input type="password" name="password"/>
+            </div>
+            <div>
+                <label>Confirm Password</label>
+                <input type="password" name="confirmPassword"/>
+            </div>
+            <div>
+                <button id="registerBtn">Register</button>
+            </div>
+        </form>
+        <script>
+            const regBtn = document.getElementById('registerBtn');
+            regBtn.addEventListener('click',registerUser);
+        </script>
+        
+    </body>
+</html>
